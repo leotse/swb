@@ -13,18 +13,18 @@ var log = require('./helpers/misc').log;
 
 
 // script body
-async.waterfall([ data.init, script ], onComplete) ;
+async.waterfall([ init, script ], onComplete) ;
+function init(done) { data.init({ tickers: [ 'aapl' ] }, done); }
 function script(done) {
 
   log.debug('starting test script');
 
   var stock = data.get('aapl');
-  var filtered = stock.interval('2014-05-01', '2014-06-30');
+  var interval = stock.interval('2005-02-01', '2005-04-01');
 
-  _.each(filtered, function(d) { 
-    console.log('%s %s %s %s% %s', 
+  _.each(interval, function(d) { 
+    console.log('%s %s', 
       d.date.format('YYYY-MM-DD'),
-      d.open.toFixed(2), 
       d.close.toFixed(2)
       // d.change.toFixed(2), 
       // d.sma50.toFixed(2)

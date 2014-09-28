@@ -26,9 +26,13 @@ var SPLIT_TAG = 'SPLIT';
 
 
 // public - initialize the module
-module.exports.init = function(callback) {
-
+module.exports.init = function(opts, callback) {
   log.debug('initializing stock data');
+
+  // parse arguments
+  var tickers;
+  if(_.isFunction(opts)) { callback = opts; } 
+  else { tickers = opts.tickers; }
 
   // get a list of available data files
   var dir = path.join(__dirname, './raw');
@@ -37,7 +41,7 @@ module.exports.init = function(callback) {
     var doti = file.indexOf('.');
     var ticker = file.substring(0, doti);
     var ext = file.substring(doti + 1);
-    if(ext === 'csv' || ext === 'ds') {
+    if(_.contains(tickers, ticker) && (ext === 'csv' || ext === 'ds')) {
       if(!memo[ticker]) { memo[ticker] = { ticker: ticker }; }
       memo[ticker][ext] = path.join(dir, file);
     }
@@ -154,8 +158,8 @@ function Stock(ticker) {
         price.close = price.close * factor;
 
         if(split && price.date.diff(split.date) === 0) {
-          split = splits[j++];
           factor = factor * split.factor;
+          split = splits[++j];
         }
       }
     }
