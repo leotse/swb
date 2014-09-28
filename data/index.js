@@ -15,7 +15,6 @@ var _ = require('underscore');
 var async = require('async');
 
 var log = require('../helpers/misc').log;
-var indicators = require('./indicators');
 var Stock = require('./stock');
 
 
@@ -24,9 +23,12 @@ module.exports.init = function(opts, callback) {
   log.debug('initializing stock data');
 
   // parse arguments
-  var tickers;
+  var tickers, indicators;
   if(_.isFunction(opts)) { callback = opts; } 
-  else { tickers = opts.tickers; }
+  else { 
+    tickers = opts.tickers; 
+    indicators = opts.indicators;
+  }
 
   // get a list of available data files
   var dir = path.join(__dirname, './raw');
@@ -76,7 +78,7 @@ module.exports.init = function(opts, callback) {
 
       },
       function(done) {
-        stock.commit();
+        stock.commit(indicators);
         setImmediate(done);
       }
     ], fileDone);

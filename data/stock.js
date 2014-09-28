@@ -4,6 +4,7 @@
 
 
 // lib
+var path = require('path');
 var _ = require('underscore');
 var moment = require('moment');
 var log = require('../helpers/misc').log;
@@ -63,7 +64,7 @@ module.exports = function Stock(ticker) {
     }
   };
 
-  self.commit = function() {
+  self.commit = function(indicators) {
 
     var prices = self.series();
 
@@ -83,6 +84,15 @@ module.exports = function Stock(ticker) {
           split = splits[++j];
         }
       }
+    }
+
+    // apply indicators
+    if(indicators && indicators.length > 0) {
+      var apply;
+      _.each(indicators, function(indicator) {
+        apply = require(path.join(__dirname, './indicators', indicator));
+        apply(self);
+      });
     }
 
     // init completed

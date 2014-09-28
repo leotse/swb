@@ -14,20 +14,28 @@ var log = require('./helpers/misc').log;
 
 // script body
 async.waterfall([ init, script ], onComplete) ;
-function init(done) { data.init({ tickers: [ 'bjri' ] }, done); }
+
+function init(done) { 
+  data.init({ 
+    tickers: [ 'aapl' ],
+    indicators: [ 'change', 'sma' ] 
+  }, done); 
+}
+
 function script(done) {
 
   log.debug('starting test script');
 
-  var stock = data.get('bjri');
-  var interval = stock.interval('1997-01-01', '1997-02-01');
+  var stock = data.get('aapl');
+  var interval = stock.interval('2000-02-01', '2000-03-01');
 
   _.each(interval, function(d) { 
-    console.log('%s %s', 
+    console.log('%s %s %s %s\% %s', 
       d.date.format('YYYY-MM-DD'),
-      d.close.toFixed(4)
-      // d.change.toFixed(4), 
-      // d.sma50.toFixed(4)
+      d.open.toFixed(4),
+      d.close.toFixed(4),
+      d.change.toFixed(4), 
+      d.sma50.toFixed(4)
     ); 
   });
 
