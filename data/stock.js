@@ -35,6 +35,7 @@ module.exports = function Stock(ticker) {
       close = Number(parts[4]), volume = Number(parts[5]), adjClose = Number(parts[6]);
 
     series.push({
+      ticker: ticker,
       date: date,
       open: open,
       high: high,
