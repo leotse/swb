@@ -40,7 +40,7 @@ module.exports = function Portfolio(cash) {
       _.each(positions, function(p) {
         pvalue += price * p.shares;
         profit = (price - p.price) * p.shares;
-        log.debug('%s %s %s@$%s profit: $%s', 
+        log.debug('%s %s %s@%s profit: $%s', 
           (p.shares >= 0 ? 'long' : 'short'), 
           p.ticker, 
           Math.abs(p.shares),
@@ -50,8 +50,9 @@ module.exports = function Portfolio(cash) {
       });
     }
 
-    log.debug('cash balance: %s', balance.toFixed(2));
-    log.debug('paper total: %s', (balance + pvalue).toFixed(2));
+    log.debug('open positions: $%s', pvalue.toFixed(2));
+    log.debug('cash balance: $%s', balance.toFixed(2));
+    log.debug('paper total: $%s', (balance + pvalue).toFixed(2));
     log.debug('change: %s\%', ((balance + pvalue - origbalance) / origbalance * 100).toFixed(2));
     log.debug('==================== p&l ====================');
   };
@@ -59,7 +60,7 @@ module.exports = function Portfolio(cash) {
 
   // long a position
   self.buy = function(date, ticker, price, shares) {
-    log.debug('%s buying position %s %s@$%s', date.format(DATE_FORMAT), ticker, shares, price.toFixed(4));
+    log.debug('%s buying position %s %s@%s', date.format(DATE_FORMAT), ticker, shares, price.toFixed(4));
 
     var position = positions[ticker];
     if(!position) {
@@ -73,7 +74,7 @@ module.exports = function Portfolio(cash) {
       // update average entry price
       if(position.shares > 0) { // simple average for long on long
         position.price = (position.shares * position.price + price * shares) / (position.shares + shares);
-      } else if(position.shares < 0 && position.shares + share > 0) { // short cover + more
+      } else if(position.shares < 0 && position.shares + shares > 0) { // short cover + more
         position.price = price;
       }
 
@@ -89,7 +90,7 @@ module.exports = function Portfolio(cash) {
 
   // sell a long position
   self.sell = function(date, ticker, price, shares) {
-    log.debug('%s selling position %s %s@$%s', date.format(DATE_FORMAT), ticker, shares, price.toFixed(4));
+    log.debug('%s selling position %s %s@%s', date.format(DATE_FORMAT), ticker, shares, price.toFixed(4));
 
     var position = positions[ticker];
     if(!position) { 
@@ -103,7 +104,7 @@ module.exports = function Portfolio(cash) {
       // update average entry price
       if(position.shares < 0) { // simple average for short on short
         position.price = (-position.shares * position.price + price * shares) / (-position.shares + shares);
-      } else if(position.shares < 0 && position.shares + share > 0) { // sell all + more
+      } else if(position.shares > 0 && position.shares - shares < 0) { // sell all + more
         position.price = price;
       }
 

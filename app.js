@@ -35,9 +35,10 @@ function backtest(done) {
 
   // test portfolio
   var portfolio = new Portfolio(10000);
-  // portfolio.sell(moment.utc(), 'aapl', 100, 20);
-  portfolio.sell(moment.utc(), 'aapl', 100, 10);
-  portfolio.sell(moment.utc(), 'aapl', 110, 10);
+  portfolio.sell(moment.utc(), 'aapl', 100, 20);
+  portfolio.buy(moment.utc(), 'aapl', 100, 30);
+  portfolio.sell(moment.utc(), 'aapl', 100, 20);
+  portfolio.buy(moment.utc(), 'aapl', 100, 20);
   portfolio.pnl(100);
 
   // test trading strategy
