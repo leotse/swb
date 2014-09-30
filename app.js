@@ -8,6 +8,7 @@
 // libs
 var _ = require('underscore');
 var async = require('async');
+var moment = require('moment');
 var data = require('./data');
 var log = require('./helpers/misc').log;
 var Strategy = require('./strategy');
@@ -19,7 +20,7 @@ async.waterfall([ init, backtest ], onComplete) ;
 
 function init(done) { 
   data.init({ 
-    tickers: [ 's&p' ],
+    tickers: [ 'aapl' ],
     indicators: [ 'change', 'sma' ] 
   }, done); 
 }
@@ -29,14 +30,20 @@ function backtest(done) {
   log.debug('starting backtest');
 
   // retrieve backtest time interval
-  var stock = data.get('s&p');
-  var interval = stock.interval('2009-01-01', '2014-01-01');
+  var stock = data.get('aapl');
+  var interval = stock.interval('2013-01-01', '2014-01-01');
 
-  // test strategy
+  // test portfolio
   var portfolio = new Portfolio(10000);
-  var strategy = new Strategy(portfolio);
-  strategy.test(interval);
-  portfolio.pnl(interval[0].close);
+  // portfolio.sell(moment.utc(), 'aapl', 100, 20);
+  portfolio.sell(moment.utc(), 'aapl', 100, 10);
+  portfolio.sell(moment.utc(), 'aapl', 110, 10);
+  portfolio.pnl(100);
+
+  // test trading strategy
+  // var strategy = new Strategy(portfolio);
+  // strategy.test(interval);
+  // portfolio.pnl(interval[0].close);
 
   // debug output
   // _.each(interval, function(d) { 
@@ -56,5 +63,5 @@ function backtest(done) {
 
 function onComplete(err) {
   if(err) { throw err; }
-  console.log('done!');
+  log.debug('done!');
 }

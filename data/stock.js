@@ -101,16 +101,10 @@ module.exports = function Stock(ticker) {
   }
 
   // return the entire series
-  self.series = function() { 
-    // ensureInitialized();
-    return series; 
-  };
+  self.series = function() { return series; };
 
   // return the stock splits data
-  self.splits = function() {
-    // ensureInitialized();
-    return splits;
-  }
+  self.splits = function() { return splits; };
 
   // return an interval, inclusive start and end parameter
   self.interval = function(start, end) {

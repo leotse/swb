@@ -17,11 +17,11 @@ module.exports = function Strategy(portfolio) {
   self.test = function(data) {
     var replay = data.reverse();
     _.each(replay, function(d) {
-      if(d.change <= -0.5) {
+      if (portfolio.positions()[d.ticker]) {
+        portfolio.buy(d.date, d.ticker, d.close, portfolio.positions()[d.ticker].shares);
+      } else if(d.change >= 5) {
         var shares = Math.round(portfolio.balance() * 0.1 / d.close);
-        portfolio.buy(d.date, d.ticker, d.close, shares);
-      } else if (portfolio.positions()[d.ticker]) {
-        portfolio.sell(d.date, d.ticker, d.close, portfolio.positions()[d.ticker].shares);
+        portfolio.sell(d.date, d.ticker, d.close, shares);
       }
     });
   };
