@@ -19,21 +19,24 @@ var Portfolio = require('./portfolio');
 var Market = require('./market');
 
 
+// args
+var tickers = [ 'aapl', 'msft' ];
+
 // start test app
 async.waterfall([ init, start ], onComplete) ;
 
 
 function init(done) { 
   data.init({ 
-    tickers: [ 'aapl' ],
+    tickers: tickers,
     indicators: [ 'change', 'sma' ] 
   }, done); 
 }
 
 function start(done) {
-  var market = new Market({ tickers: ['aapl'], start: '2013-01-01', end: '2014-02-01'});
+  var market = new Market({ tickers: tickers, start: '2013-01-01', end: '2013-02-01'});
   market.on('change', function(data) {
-    console.log(data.sma50);
+    console.log('%s %s %s', data.date.format('YYYY-MM-DD'), data.ticker, data.close.toFixed(4));
   });
   market.emulate();
 }

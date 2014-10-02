@@ -35,12 +35,25 @@ function Market(opts) {
 
   // start emulating the mraket
   self.emulate = function() {
-    var ticker = tickers[0];
-    var interval = data.get(ticker).interval(opts.start, opts.end);
-    var history = interval.reverse();
-    _.each(history, function(d) {
-      self.emit('change', d);
-    });
+
+    var datasets = _.chain(tickers)
+      .map(function(ticker) { return data.get(ticker); })
+      .map(function(stock) { return stock.interval(opts.start, opts.end); })
+      .value();
+
+    var lengths = _.chain(datasets)
+      .countBy(function(s) { return s.length; })
+      .size()
+      .value();
+    if(lengths > 1) { throw new Error('asymmetric market data not supported at this time'); }
+
+    var i, j, dataset, dateLength = datasets[0].length;
+    for(i = 0; i < dateLength; i++) {
+      for(j = 0; j < datasets.length; j++) {
+        dataset = datasets[j];
+        self.emit('change', dataset[i]);
+      }
+    }
   };
 };
 util.inherits(Market, events.EventEmitter);
