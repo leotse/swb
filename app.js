@@ -33,33 +33,19 @@ function backtest(done) {
   var stock = data.get('aapl');
   var interval = stock.interval('2013-01-01', '2014-01-01');
 
-  // test portfolio
-  var portfolio = new Portfolio(10000);
-  portfolio.sell(moment.utc(), 'aapl', 100, 20);
-  portfolio.buy(moment.utc(), 'aapl', 100, 30);
-  portfolio.sell(moment.utc(), 'aapl', 100, 20);
-  portfolio.buy(moment.utc(), 'aapl', 100, 20);
-  portfolio.pnl(100);
-
-  // test trading strategy
-  // var strategy = new Strategy(portfolio);
-  // strategy.test(interval);
-  // portfolio.pnl(interval[0].close);
-
   // debug output
-  // _.each(interval, function(d) { 
-  //   console.log('%s %s %s %s\% %s', 
-  //     d.date.format('YYYY-MM-DD'),
-  //     d.open.toFixed(4),
-  //     d.close.toFixed(4),
-  //     d.change.toFixed(4), 
-  //     d.sma50.toFixed(4)
-  //   ); 
-  // });
+  _.each(interval, function(d) { 
+    console.log('%s %s %s %s\% %s', 
+      d.date.format('YYYY-MM-DD'),
+      d.open.toFixed(4),
+      d.close.toFixed(4),
+      d.change.toFixed(4), 
+      d.sma50.toFixed(4)
+    ); 
+  });
 
   setImmediate(done);
 }
-
 
 
 function onComplete(err) {

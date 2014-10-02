@@ -18,10 +18,10 @@ module.exports = function Strategy(portfolio) {
     var replay = data.reverse();
     _.each(replay, function(d) {
       if (portfolio.positions()[d.ticker]) {
-        portfolio.buy(d.date, d.ticker, d.close, portfolio.positions()[d.ticker].shares);
-      } else if(d.change >= 5) {
+        portfolio.sell(d.date, d.ticker, d.close, portfolio.positions()[d.ticker].shares);
+      } else if(d.change <= -5) {
         var shares = Math.round(portfolio.balance() * 0.1 / d.close);
-        portfolio.sell(d.date, d.ticker, d.close, shares);
+        portfolio.buy(d.date, d.ticker, d.close, shares);
       }
     });
   };
