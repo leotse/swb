@@ -20,11 +20,12 @@ var Market = require('./market');
 
 
 // args
-var tickers = [ 'aapl', 'msft' ];
+var tickers = [ 'aapl', 'msft', 'ddd', 'brk-b' ];
+var startDate = '2013-01-01';
+var endDate = '2013-01-15';
 
 // start test app
 async.waterfall([ init, start ], onComplete) ;
-
 
 function init(done) { 
   data.init({ 
@@ -34,7 +35,7 @@ function init(done) {
 }
 
 function start(done) {
-  var market = new Market({ tickers: tickers, start: '2013-01-01', end: '2013-02-01'});
+  var market = new Market({ tickers: tickers, start: startDate, end: endDate });
   market.on('change', function(data) {
     console.log('%s %s %s', data.date.format('YYYY-MM-DD'), data.ticker, data.close.toFixed(4));
   });
