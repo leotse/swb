@@ -20,9 +20,9 @@ var Market = require('./market');
 
 
 // args
-var tickers = [ 'aapl', 'msft', 'ddd', 'brk-b' ];
-var startDate = '2013-01-01';
-var endDate = '2013-01-15';
+var tickers = [ 'aapl', 'msft' ];
+var startDate = '1986-03-01';
+var endDate = '1986-04-01';
 
 // start test app
 async.waterfall([ init, start ], onComplete) ;

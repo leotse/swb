@@ -41,18 +41,24 @@ function Market(opts) {
       .map(function(stock) { return stock.interval(opts.start, opts.end); })
       .value();
 
-    var lengths = _.chain(datasets)
-      .countBy(function(s) { return s.length; })
-      .size()
-      .value();
-    if(lengths > 1) { throw new Error('asymmetric market data not supported at this time'); }
+    // start emulating market
+    var pointers = _.map(datasets, function(s) { 
+      return { 
+        i: s.length - 1, 
+        dataset: s 
+      };
+    });
 
-    var i, j, dataset, dateLength = datasets[0].length;
-    for(i = 0; i < dateLength; i++) {
-      for(j = 0; j < datasets.length; j++) {
-        dataset = datasets[j];
-        self.emit('change', dataset[i]);
-      }
+    var quote, date = start;
+    while(date.diff(end) <= 0) {
+      _.each(pointers, function(p) {
+        quote = p.dataset[p.i];
+        if(quote && quote.date.diff(date) === 0) {
+          self.emit('change', quote);
+          p.i--;
+        }
+      });
+      date.add(1, 'days');
     }
   };
 };
