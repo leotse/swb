@@ -36,7 +36,7 @@ function start(done) {
   var interval = stock.interval('2013-01-01', '2014-01-01');
 
   // test portfolio
-  var portfolio = new Portfolio(10000);
+  var portfolio = new Portfolio(5000000);
   var date = moment.utc();
 
   // brk-b - buy and hold
@@ -86,14 +86,23 @@ function start(done) {
   // result: long 300@53.3333, -$14500 balance
 
   // print positions
-  var net;
-  _.each(portfolio.positions(), function(p, ticker) {
-    console.log('%s %s', ticker, JSON.stringify(p.net()));
-  });
+  // var net;
+  // _.each(portfolio.positions(), function(p, ticker) {
+  //   console.log('%s %s', ticker, JSON.stringify(p.net()));
+  // });
 
   // print pnl
-  // portfolio.pnl(100);
+  portfolio.pnl({
+    'brk-b': 110000.0000,
+    'aapl': 120.0000,
+    'ddd': 80.0000,
+    'tsla': 300.0000,
+    'wfm': 120.0000,
+    'msft': 28.0000,
+    'sbux': 78.000
+  });
 
+  // test completed!
   setImmediate(done);
 }
 

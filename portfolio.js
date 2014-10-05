@@ -6,6 +6,7 @@
 // libs
 var _ = require('underscore');
 var log = require('./helpers/misc').log;
+var Position = require('./position');
 
 
 // const
@@ -22,43 +23,13 @@ module.exports = function Portfolio(cash) {
   var balance = origbalance;
 
 
-  // gets the current balance
+  // public - gets the current balance
   self.balance = function() { return balance; };
 
-  // gets the current positions
+  // public - gets the current positions
   self.positions = function() { return positions; };
 
-  // outputs the p&l
-  self.pnl = function(price) {
-    log.debug('==================== p&l ====================');
-
-    // calcualte position paper value
-    var pvalue = 0;
-    if(_.size(positions) === 0) { log.debug('no positions'); }
-    else {
-      var profit;
-      _.each(positions, function(p) {
-        pvalue += price * p.shares;
-        profit = (price - p.price) * p.shares;
-        log.debug('%s %s %s@%s profit: $%s', 
-          (p.shares >= 0 ? 'long' : 'short'), 
-          p.ticker, 
-          Math.abs(p.shares),
-          p.price.toFixed(4), 
-          profit.toFixed(2)
-        );
-      });
-    }
-
-    log.debug('open positions: $%s', pvalue.toFixed(2));
-    log.debug('cash balance: $%s', balance.toFixed(2));
-    log.debug('paper total: $%s', (balance + pvalue).toFixed(2));
-    log.debug('change: %s\%', ((balance + pvalue - origbalance) / origbalance * 100).toFixed(2));
-    log.debug('==================== p&l ====================');
-  };
-
-
-  // long a position
+  // public - long a position
   self.buy = function(date, ticker, price, shares) {
     log.debug('%s buying position %s %s@%s', date.format(DATE_FORMAT), ticker, shares, price.toFixed(4));
 
@@ -68,11 +39,11 @@ module.exports = function Portfolio(cash) {
       position = new Position(ticker); 
       position.buy(date, price, shares);
       positions[ticker] = position;
-    } 
+    }
+    balance -= price * shares;
   };
 
-
-  // sell a long position
+  // public - sell a long position
   self.sell = function(date, ticker, price, shares) {
     log.debug('%s selling position %s %s@%s', date.format(DATE_FORMAT), ticker, shares, price.toFixed(4));
 
@@ -83,76 +54,40 @@ module.exports = function Portfolio(cash) {
       position.sell(date, price, shares);
       positions[ticker] = position;
     }
-  };
-}
-
-
-// helper class position
-function Position(ticker) {
-  if(!ticker) { throw new Error('ticker is required when creating a new position'); }
-  var self = this;
-  var transactions = [];
-  var balance = 0;
-  var shares = 0;
-  var price = 0;
-
-  // public - buy a position
-  self.buy = function(bdate, bprice, bshares) { 
-
-    // short covering check
-    if(shares < 0 && shares + bshares > 0) { throw new Error('position smaller than short cover amount; close current position before going long'); }
-
-    // execute trade
-    add('buy',  bdate, bprice, bshares);
-    shares += bshares;
-    balance -= bprice * bshares;
-
-    // update avg price accordingly
-    if(shares < 0) { price = price; } // no update to avg price when covering a portion of the position
-    else if(shares === 0) { price = null; } // position closed
-    else { price = (price * (shares - bshares) + bprice * bshares) / shares;  }
+    balance += price * shares;
   };
 
-  // public - sell a position
-  self.sell = function(bdate, bprice, bshares) { 
+  // public - calculate pnl for the given prices map
+  self.pnl = function(quotes) {
+    var quote, pnet, pl, total = 0;
+    _.each(positions, function(position, ticker) {
+      quote = quotes[ticker];
+      pnet = position.net();
 
-    // make sure there's enough shares to sell
-    if(shares > 0 && shares - bshares < 0) { throw new Error('position smaller than sell amount; close current position before going short'); }
+      if(!quote && pnet.type !== 'closed') { throw new Error('pnl w/ incompleted market data not supported currently'); }
+      if(pnet.type === 'closed') {
 
-    // execute trade
-    add('sell', bdate, bprice, bshares); 
-    shares -= bshares;
-    balance += bprice * bshares;
+        pl = pnet.balance;
+        total += pl;
+        console.log('%s %s p/l: %s',
+          pnet.type,
+          ticker,
+          pnet.balance
+        );
+      } else {
 
-    // update avg price accordingly
-    if(shares < 0) { price = (price * (-shares - bshares) + bprice * bshares) / -shares; }
-    else if(shares > 0) { price = price } // no change for selling existing position
-    else { price = null; } // position closed
-  };
-
-  // public - calc net position
-  self.net = function() {
-    var type;
-    if(shares > 0) { type = 'long'; }
-    else if(shares < 0) { type = 'short'; }
-    else { type = 'closed'; }
-
-    return {
-      type: type,
-      balance: balance,
-      shares: shares,
-      price: price
-    }
-  };
-
-
-  // helper - add a new position
-  function add(type, date, price, shares) {
-    transactions.push({
-      type: type,
-      date: date, 
-      price: price,
-      shares: shares
+        pl = (quote - pnet.price) * pnet.shares;
+        total += pl;
+        console.log('%s %s %s@%s p/l: %s', 
+          pnet.type,
+          ticker,
+          Math.abs(pnet.shares),
+          pnet.price.toFixed(4),
+          pl.toFixed(4)
+        );
+      }
     });
-  }
+
+    console.log('total p/l: %s', total);
+  };
 }
