@@ -60,6 +60,7 @@ function Market(opts) {
       });
       date.add(1, 'days');
     }
+    self.emit('close');
   };
 };
 util.inherits(Market, events.EventEmitter);

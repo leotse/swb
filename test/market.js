@@ -1,32 +1,29 @@
-///////////////////////
-// test/starategy.js //
-///////////////////////
+////////////////////
+// test/market.js //
+////////////////////
 
 // main entry for any test script
 
 
 // libs
+var util = require('util');
+
 var _ = require('underscore');
 var async = require('async');
 var moment = require('moment');
 
 var data = require('../data');
 var log = require('../helpers/misc').log;
-
 var Strategy = require('../strategy');
 var Portfolio = require('../portfolio');
 var Market = require('../market');
 
-
-// test args
+// args
 var tickers = [ 'aapl', 'msft' ];
 var startDate = '1986-03-01';
 var endDate = '1986-04-01';
 
-var portfolio = new Portfolio(10000);
-var strategy = new Strategy(portfolio);
-
-// script body
+// start test app
 async.waterfall([ init, start ], onComplete) ;
 
 function init(done) { 
@@ -37,24 +34,13 @@ function init(done) {
 }
 
 function start(done) {
-
-  log.debug('starting strategy test');
-
-  // retrieve stock time interval
-  var stock = data.get('aapl');
-  var interval = stock.interval(startDate, endDate);
   var market = new Market({ tickers: tickers, start: startDate, end: endDate });
-
-  // test trading strategy
-  strategy.test(market, onComplete);
+  market.on('change', function(data) { console.log('%s %s %s', data.date.format('YYYY-MM-DD'), data.ticker, data.close.toFixed(4)); });
+  market.on('close', done);
   market.emulate();
 }
 
-
 function onComplete(err) {
   if(err) { throw err; }
-  log.debug('market close!');
-  console.log(portfolio.positions());
-  console.log(portfolio.balance());
-  // portfolio.pnl(interval[0].close);
+  log.debug('done!');
 }

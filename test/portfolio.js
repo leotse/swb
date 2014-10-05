@@ -6,9 +6,11 @@
 
 
 // libs
+var util = require('util');
 var _ = require('underscore');
 var async = require('async');
 var moment = require('moment');
+
 var data = require('../data');
 var log = require('../helpers/misc').log;
 var Strategy = require('../strategy');
@@ -35,11 +37,62 @@ function start(done) {
 
   // test portfolio
   var portfolio = new Portfolio(10000);
-  portfolio.sell(moment.utc(), 'aapl', 100, 20);
-  portfolio.buy(moment.utc(), 'aapl', 100, 30);
-  portfolio.sell(moment.utc(), 'aapl', 100, 20);
-  portfolio.buy(moment.utc(), 'aapl', 100, 20);
-  portfolio.pnl(100);
+  var date = moment.utc();
+
+  // brk-b - buy and hold
+  portfolio.buy(date, 'brk-b', 100000, 10);
+  portfolio.buy(date, 'brk-b', 110000, 5);
+  portfolio.buy(date, 'brk-b', 120000, 3);
+  portfolio.buy(date, 'brk-b', 130000, 2);
+  // result: long 20@108500.0000
+
+  // aapl - buy low sell high
+  portfolio.buy(date, 'aapl', 80, 100);
+  portfolio.sell(date, 'aapl', 100, 100);
+  // result: no position, $2000 profit
+
+  // ddd - increase position on the way down, sell high
+  portfolio.buy(date, 'ddd', 80, 100);
+  portfolio.buy(date, 'ddd', 40, 200);
+  portfolio.sell(date, 'ddd', 100, 300);
+  // result: no position, $14000 profit
+
+  // tsla - buy high sell low
+  portfolio.buy(date, 'tsla', 250, 100);
+  portfolio.buy(date, 'tsla', 200, 100);
+  portfolio.sell(date, 'tsla', 150, 200);
+  // result: no position, $15000 loss
+
+  // wfm - panicky trader
+  portfolio.buy(date, 'wfm', 100, 50);
+  portfolio.sell(date, 'wfm', 100, 50);
+  portfolio.buy(date, 'wfm', 100, 50);
+  portfolio.sell(date, 'wfm', 100, 50);
+  // result: closed, $0 balance
+
+  // msft - short and hold
+  portfolio.sell(date, 'msft', 25, 100);
+  portfolio.sell(date, 'msft', 30, 100);
+  portfolio.sell(date, 'msft', 35, 100);
+  // result: short 300@30.000
+
+  // sbux - real life trades
+  portfolio.buy(date, 'sbux', 40, 100);
+  portfolio.sell(date, 'sbux', 50, 50);
+  portfolio.sell(date, 'sbux', 60, 50);
+  portfolio.buy(date, 'sbux', 70, 100);
+  portfolio.buy(date, 'sbux', 50, 100);
+  portfolio.buy(date, 'sbux', 40, 100);
+  // result: long 300@53.3333, -$14500 balance
+
+  // print positions
+  var net;
+  _.each(portfolio.positions(), function(p, ticker) {
+    console.log('%s %s', ticker, JSON.stringify(p.net()));
+  });
+
+  // print pnl
+  // portfolio.pnl(100);
 
   setImmediate(done);
 }

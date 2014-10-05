@@ -18,7 +18,6 @@ var Strategy = require('./strategy');
 var Portfolio = require('./portfolio');
 var Market = require('./market');
 
-
 // args
 var tickers = [ 'aapl', 'msft' ];
 var startDate = '1986-03-01';
@@ -35,11 +34,8 @@ function init(done) {
 }
 
 function start(done) {
-  var market = new Market({ tickers: tickers, start: startDate, end: endDate });
-  market.on('change', function(data) {
-    console.log('%s %s %s', data.date.format('YYYY-MM-DD'), data.ticker, data.close.toFixed(4));
-  });
-  market.emulate();
+  // some dirty test code here
+  // move to proper test when ready
 }
 
 function onComplete(err) {
