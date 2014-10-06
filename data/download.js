@@ -26,7 +26,7 @@ var SPLIT_LOCAL = path.join(__dirname, './raw/%s.ds');
 var symbols = [ 
   { symbol: '^GSPC', name: 's&p' }, 
   { symbol: '^IXIC', name: 'nasdaq' }, 
-  'aapl', 'msft', 'tsla', 'sbux', 'brk-b', 'dis', 'ddd', 'wfm', 'bjri'
+  'aapl', 'msft', 'tsla', 'sbux', 'brk-b', 'dis', 'ddd', 'wfm', 'bjri', 'goog', 'c', 'gs', 'jpm', 'nok', 'bbry'
 ];
 
 

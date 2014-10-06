@@ -81,6 +81,6 @@ module.exports = function Portfolio(cash) {
 
     var total = balance + asset;
     var change = (total - origbalance) / origbalance * 100;
-    console.log('net: %s -> %s change: %s\%', origbalance.toFixed(2), total.toFixed(2), change.toFixed(2));
+    console.log('net: %s -> %s change: %s\%', origbalance.toFixed(2), total.toFixed(2), change.toFixed(2));  
   };
 };
