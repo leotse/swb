@@ -24,6 +24,7 @@ function Market(opts) {
   var tickers = opts.tickers;
   var start = moment.utc(opts.start, DATE_FORMAT);
   var end = moment.utc(opts.end, DATE_FORMAT);
+  var current = {};
 
   if(!tickers || tickers.length === 0) { throw new Error('at least one ticker is required'); }
   if(!start.isValid() || !end.isValid()) { throw new Error('start and end date must be in format ' + DATE_FORMAT); }
@@ -32,9 +33,12 @@ function Market(opts) {
   var self = this;
   events.EventEmitter.call(self);
 
+  // return the most current market quotes
+  self.current = function() { return current; };
+
 
   // start emulating the mraket
-  self.emulate = function() {
+  self.emulate = function(delay) {
 
     var datasets = _.chain(tickers)
       .map(function(ticker) { return data.get(ticker); })
@@ -55,6 +59,7 @@ function Market(opts) {
         quote = p.dataset[p.i];
         if(quote && quote.date.diff(date) === 0) {
           self.emit('change', quote);
+          current[quote.ticker] = quote;
           p.i--;
         }
       });

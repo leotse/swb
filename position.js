@@ -71,4 +71,4 @@ module.exports = function Position(ticker) {
       shares: shares
     });
   }
-}
+};

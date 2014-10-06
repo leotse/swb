@@ -19,12 +19,13 @@ var Market = require('../market');
 
 
 // test args
-var tickers = [ 'aapl', 'msft' ];
-var startDate = '1986-03-01';
-var endDate = '1986-04-01';
+var tickers = [ 'aapl', 'msft', 'brk-b', 'dis', 'ddd', 'sbux', 'bjri', 'wfm', 'tsla' ];
+var startDate = '2000-01-01';
+var endDate = '2014-01-01';
 
 var portfolio = new Portfolio(10000);
 var strategy = new Strategy(portfolio);
+var market = new Market({ tickers: tickers, start: startDate, end: endDate });
 
 // script body
 async.waterfall([ init, start ], onComplete) ;
@@ -40,11 +41,6 @@ function start(done) {
 
   log.debug('starting strategy test');
 
-  // retrieve stock time interval
-  var stock = data.get('aapl');
-  var interval = stock.interval(startDate, endDate);
-  var market = new Market({ tickers: tickers, start: startDate, end: endDate });
-
   // test trading strategy
   strategy.test(market, onComplete);
   market.emulate();
@@ -54,7 +50,5 @@ function start(done) {
 function onComplete(err) {
   if(err) { throw err; }
   log.debug('market close!');
-  console.log(portfolio.positions());
-  console.log(portfolio.balance());
-  // portfolio.pnl(interval[0].close);
+  portfolio.pnl(market.current());
 }

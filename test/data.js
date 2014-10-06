@@ -29,14 +29,15 @@ function backtest(done) {
 
   // retrieve backtest time interval
   var stock = data.get('aapl');
-  var interval = stock.interval('2013-01-01', '2013-02-01');
+  var interval = stock.interval('2013-01-01', '2014-01-01');
 
   // debug output
   _.each(interval, function(d) { 
-    console.log('%s %s %s %s\% %s', 
+    console.log('%s %s %s %s %s\% %s', 
       d.date.format('YYYY-MM-DD'),
       d.open.toFixed(4),
       d.close.toFixed(4),
+      d.adjClose.toFixed(4),
       d.change.toFixed(4), 
       d.sma50.toFixed(4)
     ); 

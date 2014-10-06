@@ -29,10 +29,11 @@ module.exports = function Portfolio(cash) {
   // public - gets the current positions
   self.positions = function() { return positions; };
 
+  // public - get a specific position
+  self.position = function(ticker) { return positions[ticker]; };
+
   // public - long a position
   self.buy = function(date, ticker, price, shares) {
-    log.debug('%s buying position %s %s@%s', date.format(DATE_FORMAT), ticker, shares, price.toFixed(4));
-
     var position = positions[ticker];
     if(position) { position.buy(date, price, shares); }
     else { 
@@ -41,12 +42,11 @@ module.exports = function Portfolio(cash) {
       positions[ticker] = position;
     }
     balance -= price * shares;
+    log.debug('%s buying position %s %s@%s balance: %s', date.format(DATE_FORMAT), ticker, shares, price.toFixed(4), balance.toFixed(4));
   };
 
   // public - sell a long position
   self.sell = function(date, ticker, price, shares) {
-    log.debug('%s selling position %s %s@%s', date.format(DATE_FORMAT), ticker, shares, price.toFixed(4));
-
     var position = positions[ticker];
     if(position) { position.sell(date, price, shares); }
     else {
@@ -55,29 +55,20 @@ module.exports = function Portfolio(cash) {
       positions[ticker] = position;
     }
     balance += price * shares;
+    log.debug('%s selling position %s %s@%s balance: %s', date.format(DATE_FORMAT), ticker, shares, price.toFixed(4), balance.toFixed(4));
   };
 
   // public - calculate pnl for the given prices map
-  self.pnl = function(quotes) {
-    var quote, pnet, pl, total = 0;
+  self.pnl = function(market) {
+    var quote, pnet, pl, asset = 0;
     _.each(positions, function(position, ticker) {
-      quote = quotes[ticker];
+      quote = market[ticker].close;
       pnet = position.net();
 
       if(!quote && pnet.type !== 'closed') { throw new Error('pnl w/ incompleted market data not supported currently'); }
-      if(pnet.type === 'closed') {
-
-        pl = pnet.balance;
-        total += pl;
-        console.log('%s %s p/l: %s',
-          pnet.type,
-          ticker,
-          pnet.balance
-        );
-      } else {
-
+      if(pnet.type !== 'closed') {
+        asset += pnet.shares * quote;
         pl = (quote - pnet.price) * pnet.shares;
-        total += pl;
         console.log('%s %s %s@%s p/l: %s', 
           pnet.type,
           ticker,
@@ -88,6 +79,8 @@ module.exports = function Portfolio(cash) {
       }
     });
 
-    console.log('total p/l: %s', total);
+    var total = balance + asset;
+    var change = (total - origbalance) / origbalance * 100;
+    console.log('net: %s -> %s change: %s\%', origbalance.toFixed(2), total.toFixed(2), change.toFixed(2));
   };
-}
+};
