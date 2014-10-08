@@ -72,7 +72,7 @@ module.exports = function Portfolio(opts) {
 
   // public - calculate the current paper balance
   self.paper = function(market) {
-    var quote, net, shares, price, asset;
+    var quote, net, shares, price, asset = 0;
     _.each(positions, function(position, ticker) {
       quote = market[ticker].close;
       if(!quote) { throw new Error('pnl w/ incompleted market data not supported currently'); }
@@ -81,7 +81,7 @@ module.exports = function Portfolio(opts) {
       shares = net.shares;
       price = net.price;
       if(net.type !== 'closed') {
-        asset += net.shares * quote.price;
+        asset += net.shares * quote;
       }
     });
     return asset  + balance;

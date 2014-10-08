@@ -33,8 +33,10 @@ function Market(opts) {
   var self = this;
   events.EventEmitter.call(self);
 
+  self.init = function(opts, callback) { data.init(opts,callback); };
+
   // public - returns the tickers available in this market
-  self.tickers = function() { return tickers; }
+  self.tickers = function() { return tickers; };
 
   // public - returns the most current market quotes
   self.current = function() { return current; };
@@ -70,6 +72,7 @@ function Market(opts) {
     self.emit('close');
   };
 };
+
 util.inherits(Market, events.EventEmitter);
 
 

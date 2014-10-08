@@ -10,20 +10,18 @@ var _ = require('underscore');
 var async = require('async');
 var moment = require('moment');
 
-var data = require('../data');
 var log = require('../helpers/misc').log;
-
 var Market = require('../market');
 var Portfolio = require('../portfolio');
 var Strategy = require('../strategies/oscillator');
 
 
 // test args
-var tickers = [ 'goog', 'aapl', 'msft', 'brk-b', 'dis', 'ddd', 'sbux', 'bjri', 'wfm', 'tsla' ];
+var tickers = [ 'msft', 'brk-b', 'dis', 'ddd', 'sbux', 'bjri', 'wfm', 'tsla', 'goog', 'aapl' ];
 var startDate = '2007-01-01';
 var endDate = '2014-01-01';
 
-var portfolio = new Portfolio({ cash: 50000, cost: 0 });
+var portfolio = new Portfolio({ cash: 100000, cost: 0 });
 var strategy = new Strategy(portfolio, { change: 2.5, ratio: 0.5, minOrder: 800 });
 var market = new Market({ tickers: tickers, start: startDate, end: endDate });
 
@@ -31,7 +29,7 @@ var market = new Market({ tickers: tickers, start: startDate, end: endDate });
 async.waterfall([ init, start ], onComplete) ;
 
 function init(done) { 
-  data.init({ 
+  market.init({ 
     tickers: tickers,
     indicators: [ 'change', 'sma' ] 
   }, done); 
