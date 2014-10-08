@@ -20,7 +20,8 @@ module.exports = function applyChangeIndicator(stock) {
 
 // helper - calculate moving average
 function ma(interval, series) {
-  if(series.length < interval) { throw new Error('interval must be greater than # of items in the series'); }
+  // if(series.length < interval) { throw new Error('interval must be greater than # of items in the series'); }
+  if(series.length < interval) { return; }
   var i, j, length = series.length, total = 0;
   for(i = 0; i < interval; i++) { total += series[i].close; }
   for(i = 0, j = interval; j < length; i++, j++) {

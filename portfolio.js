@@ -14,14 +14,20 @@ var DATE_FORMAT = 'YYYY-MM-DD';
 
 
 // represents a portfolio
-module.exports = function Portfolio(cash) {
+module.exports = function Portfolio(opts) {
   var self = this;
+  var cash = opts.cash;
+  var cost = opts.cost;
+
+  if(_.isUndefined(cash) || _.isUndefined(cost)) { throw new Error('cash and transaction cost are required to init a portfolio'); }
+
+  var origbalance = cash;
+  var balance = cash;
   var positions = {};
   var trades = [];
 
-  var origbalance = cash || 10000;
-  var balance = origbalance;
-
+  // public - gets the transaction cost
+  self.cost = function() { return cost; }
 
   // public - gets the current balance
   self.balance = function() { return balance; };
@@ -41,7 +47,10 @@ module.exports = function Portfolio(cash) {
       position.buy(date, price, shares);
       positions[ticker] = position;
     }
+
     balance -= price * shares;
+    balance -= cost;
+
     log.debug('%s buying position %s %s@%s balance: %s', date.format(DATE_FORMAT), ticker, shares, price.toFixed(4), balance.toFixed(4));
   };
 
@@ -54,11 +63,31 @@ module.exports = function Portfolio(cash) {
       position.sell(date, price, shares);
       positions[ticker] = position;
     }
+
     balance += price * shares;
+    balance -= cost;
+
     log.debug('%s selling position %s %s@%s balance: %s', date.format(DATE_FORMAT), ticker, shares, price.toFixed(4), balance.toFixed(4));
   };
 
-  // public - calculate pnl for the given prices map
+  // public - calculate the current paper balance
+  self.paper = function(market) {
+    var quote, net, shares, price, asset;
+    _.each(positions, function(position, ticker) {
+      quote = market[ticker].close;
+      if(!quote) { throw new Error('pnl w/ incompleted market data not supported currently'); }
+
+      net = position.net();
+      shares = net.shares;
+      price = net.price;
+      if(net.type !== 'closed') {
+        asset += net.shares * quote.price;
+      }
+    });
+    return asset  + balance;
+  };
+
+  // public - print pnl for the given prices map
   self.pnl = function(market) {
     var quote, pnet, pl, asset = 0;
     _.each(positions, function(position, ticker) {

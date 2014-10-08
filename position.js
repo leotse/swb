@@ -15,6 +15,10 @@ module.exports = function Position(ticker) {
   // public - buy a position
   self.buy = function(bdate, bprice, bshares) { 
 
+    // input checking
+    if(!bdate.isValid()) { throw new Error('invalid date obj'); }
+    if(bprice <= 0 || bshares <= 0) { throw new Error('price and shares must be greater than 0'); }
+
     // short covering check
     if(shares < 0 && shares + bshares > 0) { throw new Error('position smaller than short cover amount; close current position before going long'); }
 
@@ -31,6 +35,10 @@ module.exports = function Position(ticker) {
 
   // public - sell a position
   self.sell = function(bdate, bprice, bshares) { 
+
+    // input checking
+    if(!bdate.isValid()) { throw new Error('invalid date obj'); }
+    if(bprice <= 0 || bshares <= 0) { throw new Error('price and shares must be greater than 0'); }
 
     // make sure there's enough shares to sell
     if(shares > 0 && shares - bshares < 0) { throw new Error('position smaller than sell amount; close current position before going short'); }
