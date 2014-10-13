@@ -33,7 +33,7 @@ function Market(opts) {
   var self = this;
   events.EventEmitter.call(self);
 
-  self.init = function(opts, callback) { data.init(opts,callback); };
+  self.init = function(opts, callback) { data.init(opts, callback); };
 
   // public - returns the tickers available in this market
   self.tickers = function() { return tickers; };
@@ -41,7 +41,7 @@ function Market(opts) {
   // public - returns the most current market quotes
   self.current = function() { return current; };
 
-  // public - returns start emulating the mraket
+  // public - returns start emulating the market
   self.emulate = function(delay) {
 
     var datasets = _.chain(tickers)

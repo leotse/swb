@@ -19,7 +19,7 @@ var Portfolio = require('./portfolio');
 var Market = require('./market');
 
 // args
-var tickers = [ 'aapl', 'msft' ];
+var tickers = [ 'aapl', 'msft', 'brk-a', 'grmn' ];
 var startDate = '1986-03-01';
 var endDate = '1986-04-01';
 
@@ -36,6 +36,8 @@ function init(done) {
 function start(done) {
   // some dirty test code here
   // move to proper test when ready
+  console.log('dirty code');
+  setImmediate(done);
 }
 
 function onComplete(err) {
