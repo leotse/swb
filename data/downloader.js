@@ -25,7 +25,7 @@ var SPLIT_LOCAL = path.join(__dirname, './raw/%s.ds');
 // star script
 module.exports = function(symbols, callback) {
   if(!symbols || symbols.length === 0) {
-    log.debug('no symbols specified, skipping download...');
+    log.debug('all data files already available, skipping download...');
     return setImmediate(callback);
   }
 

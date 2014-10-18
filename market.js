@@ -22,6 +22,7 @@ var DATE_FORMAT = 'YYYY-MM-DD';
 // class defn
 function Market(opts) {
   var tickers = opts.tickers;
+  var indicators = opts.indicators;
   var start = moment.utc(opts.start, DATE_FORMAT);
   var end = moment.utc(opts.end, DATE_FORMAT);
   var current = {};
@@ -33,7 +34,7 @@ function Market(opts) {
   var self = this;
   events.EventEmitter.call(self);
 
-  self.init = function(opts, callback) { data.init(opts, callback); };
+  self.init = function(callback) { data.init(opts, callback); };
 
   // public - returns the tickers available in this market
   self.tickers = function() { return tickers; };
@@ -41,8 +42,8 @@ function Market(opts) {
   // public - returns the most current market quotes
   self.current = function() { return current; };
 
-  // public - returns start emulating the market
-  self.emulate = function(delay) {
+  // public - returns start simulating the market
+  self.simulate = function(delay) {
 
     var datasets = _.chain(tickers)
       .map(function(ticker) { return data.get(ticker); })

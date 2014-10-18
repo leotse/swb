@@ -12,32 +12,38 @@ var _ = require('underscore');
 var async = require('async');
 var moment = require('moment');
 
-var data = require('./data');
 var log = require('./helpers/misc').log;
 var Strategy = require('./strategy');
 var Portfolio = require('./portfolio');
 var Market = require('./market');
 
 // args
-var tickers = [ 'aapl', 'msft', 'brk-a', 'grmn' ];
-var startDate = '1986-03-01';
-var endDate = '1986-04-01';
+var tickers = [ 'aapl' ];
+var indicators = [ 'change', 'sma', 'smac' ];
+var startDate = '1980-01-01';
+var endDate = '1981-01-01';
+
+var market = new Market({
+  tickers: tickers,
+  indicators: indicators,
+  start: startDate,
+  end: endDate
+});
 
 // start test app
-async.waterfall([ init, start ], onComplete) ;
-
-function init(done) { 
-  data.init({ 
-    tickers: tickers,
-    indicators: [ 'change', 'sma' ] 
-  }, done); 
-}
-
+async.waterfall([ market.init, start ], onComplete) ;
 function start(done) {
   // some dirty test code here
   // move to proper test when ready
-  console.log('dirty code');
-  setImmediate(done);
+  market.on('change', function(q) { 
+    console.log('%s \t %s \t %s', 
+      q.date.format('YYYY-MM-DD'), 
+      q.change.toFixed(4),
+      _.isNumber(q.smac5) ? q.smac5.toFixed(4) : '-'
+    );
+  });
+  market.on('close', done);
+  market.simulate();
 }
 
 function onComplete(err) {
