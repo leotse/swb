@@ -1,10 +1,14 @@
 {
   "name": "swb",
   "version": "1.0.0",
-  "description": "",
-  "main": "numbers.js",
-  "author": "",
+  "description": "simple market simulator",
+  "main": "app.js",
+  "author": "Leo Tse",
   "license": "ISC",
+  "repository": {
+    "type": "git",
+    "url": "git@github.com:leotse/swb.git"
+  },
   "dependencies": {
     "async": "^0.9.0",
     "moment": "^2.8.3",
