@@ -12,6 +12,9 @@ var _ = require('underscore');
 // indicator logic
 module.exports = function applyChangeIndicator(stock) {
   var series = stock.series();
+  ma(10, series);
+  ma(20, series);
+  ma(30, series);
   ma(50, series);
   ma(100, series);
   ma(200, series);

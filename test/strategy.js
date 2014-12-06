@@ -13,17 +13,22 @@ var moment = require('moment');
 var log = require('../helpers/misc').log;
 var Market = require('../market');
 var Portfolio = require('../portfolio');
-var Strategy = require('../strategies/oscillator');
+var Oscillator = require('../strategies/oscillator');
+var GCross = require('../strategies/gcross');
+var Crosses = require('../strategies/crosses');
 
 
 // test args
-var tickers = [ 'msft', 'brk-b', 'dis', 'ddd', 'sbux', 'bjri', 'wfm', 'tsla', 'goog', 'aapl' ];
-var indicators = [ 'change', 'sma', 'smac' ];
+var tickers = [ 'msft', 'brk-b', 'dis', 'ddd', 'sbux', 'bjri', 'wfm', 'tsla', 'googl', 'aapl' ];
+var indicators = [ 'change', 'sma' ];
 var startDate = '2007-01-01';
-var endDate = '2014-01-01';
+var endDate = '2015-01-01';
+
+var strategy = new Oscillator({ change: 2.5, ratio: 0.5, minOrder: 800 });
+// var strategy = new GCross();  
+// var strategy = new Crosses();
 
 var portfolio = new Portfolio({ cash: 100000, cost: 0 });
-var strategy = new Strategy(portfolio, { change: 2.5, ratio: 0.5, minOrder: 800 });
 var market = new Market({ 
   tickers: tickers, 
   indicators: indicators, 
@@ -38,7 +43,7 @@ function start(done) {
   log.debug('starting strategy test');
 
   // test trading strategy
-  strategy.test(market, onComplete);
+  strategy.test(portfolio, market, onComplete);
   market.simulate();
 }
 

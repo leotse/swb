@@ -10,7 +10,7 @@ var log = require('../helpers/misc').log;
 
 
 // strategy impl
-module.exports = function OscillatorStrategy(portfolio, opts) {
+module.exports = function OscillatorStrategy(opts) {
   var self = this;
   var change = opts.change;
   var ratio = opts.ratio;
@@ -20,7 +20,7 @@ module.exports = function OscillatorStrategy(portfolio, opts) {
   if(!change) { throw new Error('change threshold must be set for this strategy'); }
 
   // test this strategy for the given 'market'
-  self.test = function(market, callback) {
+  self.test = function(portfolio, market, callback) {
     var position;
 
     market.on('close', callback);
